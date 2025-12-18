@@ -1,0 +1,2 @@
+rootProject.name = 'springboot-secure-backend-starter'
+include 'auth-service', 'order-service'
