@@ -3,3 +3,11 @@ build/
 **/build/
 *.log
 *.tmp
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
