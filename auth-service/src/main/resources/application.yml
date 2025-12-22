@@ -5,6 +5,10 @@ spring:
 jwt:
   secret: "change-this-secret-to-very-long-random-string-1234567890"
   validity-seconds: 3600
+
+logging:
+  level:
+    org.springframework.security: DEBUG
   
 ---
 spring:
@@ -22,6 +26,10 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 
 server:
   port: 8081
