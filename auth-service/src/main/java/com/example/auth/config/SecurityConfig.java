@@ -19,7 +19,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableMethodSecurity
-@Profile("prod")
 public class SecurityConfig {
 
    @Bean
@@ -27,46 +26,44 @@ public class SecurityConfig {
       return new BCryptPasswordEncoder();
    }
 
+   /**
+    * AUTH endpoints — no security at all
+    */
    @Bean
    @Order(0)
-   public SecurityFilterChain h2ConsoleChain(HttpSecurity http) throws Exception {
-      http
-         .securityMatcher("/h2-console/**")
-         .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-         .csrf(csrf -> csrf.disable())
-         .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-         .requestCache(cache -> cache.disable());
-      return http.build();
-   }
-
-   @Bean
-   @Order(1)
    public SecurityFilterChain authChain(HttpSecurity http) throws Exception {
       http
          .securityMatcher("/auth/**")
+         .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
          .csrf(csrf -> csrf.disable())
-         .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+         .securityContext(sc -> sc.disable())
+         .requestCache(cache -> cache.disable())
+         .sessionManagement(sm -> sm.disable());
+
       return http.build();
    }
 
+   /**
+    * API endpoints — JWT protected
+    */
    @Bean
-   @Order(2)
-   public SecurityFilterChain apiChain(HttpSecurity http, JwtTokenProvider jwt) throws Exception {
-      http
-         .csrf(csrf -> csrf.disable())
-         .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-         .addFilterBefore(
-               new JwtAuthenticationFilter(jwt),
-               UsernamePasswordAuthenticationFilter.class
-         )
-         .httpBasic(b -> b.disable());
-      return http.build();
-   }
-
-   @Bean
-   public AuthenticationManager authenticationManager(
-      AuthenticationConfiguration config
+   @Order(1)
+   public SecurityFilterChain apiChain(
+         HttpSecurity http,
+         JwtAuthenticationFilter jwtFilter
    ) throws Exception {
-      return config.getAuthenticationManager();
+
+      http
+         .securityMatcher("/api/**")
+         .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+         .csrf(csrf -> csrf.disable())
+         .securityContext(sc -> sc.disable())
+         .requestCache(cache -> cache.disable())
+         .sessionManagement(sm -> sm.disable());
+
+      return http.build();
    }
+
 }
+

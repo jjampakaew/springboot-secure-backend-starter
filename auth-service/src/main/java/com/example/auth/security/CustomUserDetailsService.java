@@ -21,15 +21,20 @@ public class CustomUserDetailsService implements UserDetailsService {
    public UserDetails loadUserByUsername(String email)
          throws UsernameNotFoundException {
 
-      UserAccount user = repo.findByEmail(email)
-               .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+      System.out.println(">>> CustomUserDetailsService CALLED with email = " + email);
+
+      UserAccount user = repo.findWithRolesByEmail(email)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+      System.out.println(">>> User FOUND: " + user.getEmail());
 
       return new User(
-               user.getEmail(),
-               user.getPasswordHash(),
-               user.getRoles().stream()
-                     .map(r -> new SimpleGrantedAuthority("ROLE_" + r.getCode()))
-                     .collect(Collectors.toSet())
+            user.getEmail(),
+            user.getPasswordHash(),
+            user.getRoles().stream()
+                  .map(r -> new SimpleGrantedAuthority("ROLE_" + r.getCode()))
+                  .toList()
       );
    }
+
 }

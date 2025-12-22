@@ -1,5 +1,6 @@
 package com.example.auth.config;
 
+import com.example.auth.security.JwtAuthenticationFilter;
 import com.example.auth.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,5 +15,12 @@ public class JwtConfig {
          @Value("${jwt.validity-seconds}") long validitySeconds
    ) {
       return new JwtTokenProvider(secret, validitySeconds);
+   }
+
+   @Bean
+   public JwtAuthenticationFilter jwtAuthenticationFilter(
+         JwtTokenProvider jwtTokenProvider
+   ) {
+      return new JwtAuthenticationFilter(jwtTokenProvider);
    }
 }
