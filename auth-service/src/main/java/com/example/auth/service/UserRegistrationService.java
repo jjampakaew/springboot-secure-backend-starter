@@ -13,45 +13,45 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserRegistrationService {
 
-    private final TenantRepository tenantRepository;
-    private final UserAccountRepository userAccountRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
+   private final TenantRepository tenantRepository;
+   private final UserAccountRepository userAccountRepository;
+   private final RoleRepository roleRepository;
+   private final PasswordEncoder passwordEncoder;
 
-    public UserRegistrationService(
-            TenantRepository tenantRepository,
-            UserAccountRepository userAccountRepository,
-            RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder
-    ) {
-        this.tenantRepository = tenantRepository;
-        this.userAccountRepository = userAccountRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+   public UserRegistrationService(
+         TenantRepository tenantRepository,
+         UserAccountRepository userAccountRepository,
+         RoleRepository roleRepository,
+         PasswordEncoder passwordEncoder
+   ) {
+      this.tenantRepository = tenantRepository;
+      this.userAccountRepository = userAccountRepository;
+      this.roleRepository = roleRepository;
+      this.passwordEncoder = passwordEncoder;
+   }
 
-    @Transactional
-    public UserAccount registerUser(
-            Long tenantId,
-            String email,
-            String rawPassword
-    ) {
-        if (userAccountRepository.existsByTenantIdAndEmail(tenantId, email)) {
-            throw new IllegalStateException("Email already registered");
-        }
+   @Transactional
+   public UserAccount registerUser(
+         Long tenantId,
+         String email,
+         String rawPassword
+   ) {
+      if (userAccountRepository.existsByTenantIdAndEmail(tenantId, email)) {
+         throw new IllegalStateException("Email already registered");
+      }
 
-        Tenant tenant = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new IllegalArgumentException("Tenant not found"));
+      Tenant tenant = tenantRepository.findById(tenantId)
+               .orElseThrow(() -> new IllegalArgumentException("Tenant not found"));
 
-        String hashedPassword = passwordEncoder.encode(rawPassword);
+      String hashedPassword = passwordEncoder.encode(rawPassword);
 
-        UserAccount user = new UserAccount(tenant, email, hashedPassword);
+      UserAccount user = new UserAccount(tenant, email, hashedPassword);
 
-        Role userRole = roleRepository.findByCode("USER")
-                .orElseThrow(() -> new IllegalStateException("Default role not found"));
+      Role userRole = roleRepository.findByCode("USER")
+               .orElseThrow(() -> new IllegalStateException("Default role not found"));
 
-        user.addRole(userRole);
+      user.addRole(userRole);
 
-        return userAccountRepository.save(user);
-    }
+      return userAccountRepository.save(user);
+   }
 }

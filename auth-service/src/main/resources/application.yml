@@ -2,6 +2,10 @@ spring:
   profiles:
     active: dev
 
+jwt:
+  secret: "change-this-secret-to-very-long-random-string-1234567890"
+  validity-seconds: 3600
+  
 ---
 spring:
   config:
@@ -17,7 +21,7 @@ spring:
       ddl-auto: validate
     open-in-view: false
   flyway:
-    enabled: false
+    enabled: true
 
 server:
   port: 8081
